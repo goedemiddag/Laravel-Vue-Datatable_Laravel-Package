@@ -13,18 +13,10 @@ class FilterBelongsToRelationships
 
         if (isset($relationships['belongsTo'])) {
 
-            foreach ($relationships['belongsTo'] as $tableName => $options) {  
+            foreach ($relationships['belongsTo'] as $tableName => $options) {
 
-                if (! isset($options['model'])) {     
-                    throw new RelationshipModelNotSetException(
-                        "Model not set on relationship: $tableName"
-                    );
-                }
-
-                if (! isset($options['columns'])) {
-                    throw new RelationshipColumnsNotFoundException(
-                        "Columns array not set on relationship: $tableName"
-                    );
+                if (! isset($options['model']) || !isset($options['columns'])) {
+                    return $query;
                 }
 
                 $model = $relationshipModelFactory($options['model'], $tableName);
