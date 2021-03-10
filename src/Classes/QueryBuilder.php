@@ -2,6 +2,7 @@
 
 namespace JamesDordoy\LaravelVueDatatable\Classes;
 
+use Illuminate\Support\Str;
 //Casts
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
@@ -74,15 +75,20 @@ class QueryBuilder implements QueryBuilderContract
         
         if (isset($orderBy) && ! empty($orderBy)) {
             $defaultOrderBy = config('laravel-vue-datatables.models.order_term');
-            $tableAndColumn = count(explode(".", $orderBy)) > 1 ? $orderBy : $this->model->getTable().".$orderBy";
+            $tableAndColumn = count(explode(".", $orderBy)) > 1 ? $orderBy : $this->getOrderByColumnName($orderBy);
             $this->query->orderBy($tableAndColumn, $orderByDir);
         } else {
             $defaultOrderBy = config('laravel-vue-datatables.default_order_by');
             $defaultOrderBy = is_null($defaultOrderBy) ? 'id' : $defaultOrderBy;
-            $this->query->orderBy($this->model->getTable().".$defaultOrderBy", $orderByDir);
+            $this->query->orderBy($this->getOrderByColumnName($defaultOrderBy), $orderByDir);
         }
 
         return $this;
+    }
+
+    private function getOrderByColumnName($name)
+    {
+        return Str::endsWith($name, '_count') ? $name : $this->model->getTable() . ".$name";
     }
 
     public function addRelationships($declaredRelationship, $orderByDir)
